@@ -1,4 +1,4 @@
-This repository holds scripts to perform fragment correlation mass spectrometry (FCMS).
+This repository holds the code required to perform fragment correlation mass spectrometry (FCMS).
 
 The method is described in the following work:
 

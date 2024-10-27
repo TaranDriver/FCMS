@@ -10,5 +10,5 @@ There should be no peak picking performed in the conversion to mgf.
 The output is a list of correlation features with corresponding peak volumes and correlation score.
 The output is saved as a .npy file.
 
-This work is licensed under CC BY-NC-SA 4.0
+This work is licensed under CC BY-NC-SA 4.0.
 To enquire about licensing opportunities, please contact the author: tarandriver(at)gmail.com

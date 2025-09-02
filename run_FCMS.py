@@ -21,9 +21,9 @@ saveName=path+'/3000feats_default-params' # this is where the resampled
 numScans='all'
 
 #%%
-print 'path:', path
-print numScans, 'scans'
-print 'save in', saveName
+print('path: %s' % path)
+print(str(numScans) + ' scans')
+print('save in %s' % saveName)
 
 FCMSUtils.readmgf2(mgfFile, path)
 scan1=FCMS.Scan(path)

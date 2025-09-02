@@ -61,8 +61,8 @@ class Scan:
         fromMZ=round(self.index2mz(fromIndex), 2)
         toMZ=round(self.index2mz(toIndex), 2)
         
-        print 'ionCount from bin m/z '+ str(fromMZ)+' to bin m/z '+\
-        str(toMZ)+' for '+str(x)+' scans'
+        print('ionCount from bin m/z '+ str(fromMZ)+' to bin m/z '+\
+        str(toMZ)+' for '+str(x)+' scans')
         
         if returnBounds:
             return self.scanList[:x,fromIndex:toIndex+1].sum(axis=1), fromMZ,\
@@ -79,7 +79,7 @@ class Scan:
         """Provides the closest (rounded) integer m/z slice index relating to  
         the m/z value for the relevant scan dataset."""
         if mz < self.minMZ or mz > self.maxMZ:
-            raise ValueError, 'm/z value outside range of m/z values for this scan'
+            raise ValueError('m/z value outside range of m/z values for this scan')
         if mz % self.sliceSize < self.sliceSize/2:
             return int((mz - self.minMZ)/self.sliceSize)
         else:
@@ -99,7 +99,7 @@ class Scan:
         plt.ylabel('Relative abundance, %')  
         
 class Map:
-    'Simple or partial covariance map'
+    'Simple or contingent covariance map'
     def __init__(self, scan, numScans='all'):
         self.scan = scan
         if numScans=='all':
@@ -119,7 +119,7 @@ class Map:
             if os.path.isfile(syxPath):
                 return self.scan.normFactor**2 * np.load(syxPath)
             else:
-                print 'Syx not saved for this map, beginning calculation with saveSyxEinSum...'
+                print('Syx not saved for this map, beginning calculation with saveSyxEinSum...')
                 saveSyxEinSum(self.scan.scanFolder, numScans=self.numScans)
                 return self.scan.normFactor**2 * np.load(syxPath)
             
@@ -295,11 +295,11 @@ class Map:
         if type(saveAt) is int and basePath is None:
             basePath=raw_input('base file name for peaks file:')        
         if sampling=='bootstrap' and bsRS is None:
-            print 'calculating bootstrap resamples...'
+            print('calculating bootstrap resamples...')
             bsRS=bsResamps(self.numScans, self.numScans)
-            print 'calculating bootstrap resamples FINISHED'
+            print('calculating bootstrap resamples FINISHED')
         elif sampling=='bootstrap_with_diffs' and bsRS_diffs is None:
-            raise StandardError, 'must provide a (numResamples+1,numScans) differences array for bootstrap_with_diffs'
+            raise StandardError('must provide a (numResamples+1,numScans) differences array for bootstrap_with_diffs')
         
         for indices in indexList:
             peak=self.getPeak(indices[0], indices[1], pixOut=pixOut)
@@ -326,8 +326,7 @@ class Map:
                 peakVar=peak.bsDiffResampleVar(bsRS_diffs, cutPeak=cutPeaks, \
                 template=template)
             else:
-                raise TypeError,\
-                '\''+sampling+'\''+' not a recognised method of resampling'
+                raise TypeError('\''+sampling+'\''+' not a recognised method of resampling')
             
             featList[featNo]=round(self.scan.index2mz(indices[0]-\
             comPixOut+com_r),2), round(self.scan.index2mz(indices[1]-\
@@ -335,7 +334,7 @@ class Map:
             
             featNo+=1
             if featNo%printAt==0:            
-                print 'sig calculated for feature '+str(featNo)
+                print('sig calculated for feature '+str(featNo))
             if type(saveAt) is int and featNo%saveAt==0:
                 np.save(basePath+'_feats'+str(int(featNo-saveAt+1))+'to'+\
                 str(int(featNo))+'.npy', featList[featNo-saveAt:featNo])
@@ -408,7 +407,7 @@ class Map:
                 featCount+=1
 
                 if featCount%100==0:
-                    print 'found '+str(featCount)+' good features'
+                    print('found '+str(featCount)+' good features')
                     
             elif returnDiscards:
                 discardFeats.append([r, c])
@@ -416,8 +415,8 @@ class Map:
             clearCirc(array, r, c, circListClear)
             
             if time.time()-startTime>breakTime:
-                print 'topNfeats breaking out at '+str(featCount)+' features'\
-                +' - running time exceeded '+str(breakTime)+' secs'
+                print('topNfeats breaking out at '+str(featCount)+' features'\
+                +' - running time exceeded '+str(breakTime)+' secs')
                 if not returnDiscards:
                     return feats[:featCount] #cut to the last appended feature
                 else:
@@ -469,7 +468,7 @@ class CCovMap(Map):
             return self.scan.normFactor**2 * \
                    h5py.File(self.syxPath(), 'r')['Syx'][:]
         else:
-            print 'Syx not saved for this map, beginning calculation with saveSyxEinSumCC...'
+            print('Syx not saved for this map, beginning calculation with saveSyxEinSumCC...')
             self.saveSyxEinSumCC()
             return self.scan.normFactor**2 * \
                    h5py.File(self.syxPath(), 'r')['Syx'][:]
@@ -492,7 +491,7 @@ class CCovMap(Map):
                        h5py.File(self.syxPath(),'r')['Syx'][rIdcs[0]:rIdcs[1],\
                                        cIdcs[0]:cIdcs[1], ssIdcs[0]:ssIdcs[1]]
             else:
-                print 'Syx not saved for this map, beginning calculation with saveSyxEinSumCC...'
+                print('Syx not saved for this map, beginning calculation with saveSyxEinSumCC...')
                 self.saveSyxEinSumCC()
                 return self.scan.normFactor**2 * \
                        h5py.File(self.syxPath(),'r')['Syx'][rIdcs[0]:rIdcs[1],\
@@ -531,7 +530,7 @@ class CCovMap(Map):
         analyses. This is for c cov so Syx has a third dimension which is
         number of sets""" 
         
-        print 'Performing saveSyxEinSumCC for ' + self.syxPath()
+        print('Performing saveSyxEinSumCC for ' + self.syxPath())
 
         array = np.load(self.scan.scanFolder + '/array.npy')
 
@@ -539,7 +538,7 @@ class CCovMap(Map):
                        dtype=np.single)
         for i, setIdx in enumerate(self.setIdcs):
             if i%10==0:
-                print 'calculating Syx for set %i / %i' % (i, len(self.setIdcs))
+                print('calculating Syx for set %i / %i' % (i, len(self.setIdcs)))
             scans_i = array[setIdx+1] # row 0 of array holds m/z values so 
             # start from from 1
             Syx[:,:,i] = np.einsum('ij,ik->jk', scans_i, scans_i)  
@@ -549,7 +548,7 @@ class CCovMap(Map):
             f.create_dataset('Syx', data=Syx.astype(np.single))
         f.close()
         
-        print 'Completed saveSyxEinSumCC for ' + self.syxPath()
+        print('Completed saveSyxEinSumCC for ' + self.syxPath())
         
         return
               
@@ -561,7 +560,7 @@ class CCovMap(Map):
             self.array = np.load(self.mapPath())
             
         else:
-            print 'cCov not yet calculated for this map, beginning calculation...' 
+            print('cCov not yet calculated for this map, beginning calculation...') 
             mapScanList = self.scan.scanList[:self.numScans, :]
             self.loadSyxH5() # intialize, we're going to slice into it for each
             # scan set. This is slower than slicing into an array
@@ -570,15 +569,15 @@ class CCovMap(Map):
                     
             for i in np.arange(len(self.setIdcs)):
                 if i%1==0:
-                    print 'calculating cCov for set %i / %i' % \
-                    (i, len(self.setIdcs))
+                    print('calculating cCov for set %i / %i' % \
+                    (i, len(self.setIdcs)))
                 Syx_i = np.squeeze(self.syxH5(ssIdcs=(i,i+1)))
                 Sx_i = mapScanList[self.setIdcs[i]].sum(0)
                 covSumFull += (Syx_i - np.outer(Sx_i, Sx_i) / \
                               float(self.setSize[i])) / \
                                float(self.setSize[i] - 1)
             cCovYX = covSumFull / float(len(self.setIdcs))
-            print 'completed cCov calculation'
+            print('completed cCov calculation')
             np.save(self.mapPath(), cCovYX)
             self.array = cCovYX
 
@@ -629,7 +628,7 @@ class Peak:
         
         rad, rem = divmod(len(self.array), 2)
         if rem != 1:
-            raise ValueError, 'square width not odd integer -> ambiguous apex'
+            raise ValueError('square width not odd integer -> ambiguous apex')
         
         while valueN > integThresh:
             north += 1
@@ -894,21 +893,21 @@ class CovPeak(Peak):
         self.pixOut-maxChange:self.pixOut+maxChange+1])
 
         if rf == maxChange and cf == maxChange and printOut:
-            print 'no shift in peak apex'
+            print('no shift in peak apex')
         elif cf == maxChange:
             if printOut:
-                print 'r shifted down by '+str(rf-maxChange)+' pixels'
+                print('r shifted down by '+str(rf-maxChange)+' pixels')
             self.r += rf-maxChange
             self.build()
         elif rf == maxChange:
             if printOut:
-                print 'c shifted right by '+str(cf-maxChange)+' pixels'
+                print('c shifted right by '+str(cf-maxChange)+' pixels')
             self.c += cf-maxChange
             self.build()
         else:
             if printOut:
-                print 'r shifted down by '+str(rf-maxChange)+\
-                ' pixels and c shifted right by '+str(cf-maxChange)+' pixels'
+                print('r shifted down by '+str(rf-maxChange)+\
+                ' pixels and c shifted right by '+str(cf-maxChange)+' pixels')
             self.r += rf-maxChange
             self.c += cf-maxChange
             self.build()
@@ -1002,7 +1001,7 @@ class CCovPeak(CovPeak):
                              self.SySx() / (self.fromMap.setSize * \
                             (self.fromMap.setSize - 1))[None,None,:]
     
-    def jkResampleVar(self, cutPeak=True, template=None, int_):
+    def jkResampleVar(self, cutPeak=True, template=None):
         
         numScans=self.fromMap.numScans
         yScans=self.yScans()
@@ -1012,7 +1011,7 @@ class CCovPeak(CovPeak):
         SxFull=self.Sx()
 
         if self.mapsIndv is None:
-            print 'calculating mapsIndv within jkResampleVar, not loaded in already'
+            print('calculating mapsIndv within jkResampleVar, not loaded in already')
             self.mapsIndv=self.mapsIndv()
         mapsIndvSum=self.mapsIndv.sum(2)
         
@@ -1052,4 +1051,5 @@ class CCovPeak(CovPeak):
                 cCovSum += vol
                 cCovSumSqd += vol**2
             
+
         return (cCovSumSqd - (cCovSum**2)/(numScans))/numScans

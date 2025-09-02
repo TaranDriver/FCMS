@@ -109,7 +109,7 @@ def binSpectra(array_orig, bin_size):
 def isInFeatList(mzs, featList, ionThresh=1.5, withNumber=False):
     """Is an m/z pair in a given list of features. mzs is tuple, length 2."""
     if not (isinstance(mzs, tuple) and len(mzs)==2):
-        raise TypeError, 'mzs must be tuple of length 2'
+        raise TypeError('mzs must be tuple of length 2')
     mz1,mz2=sorted(mzs)
     compFeats=[sorted((x[0],x[1])) for x in featList]
     
@@ -200,15 +200,15 @@ def saveSyx(scanFolder, numScansList=['all']):
 
     numScansListStr = [str(x) for x in numScansList] #make a list of strings
     #of the numbers in numScansList, to enable printing below
-    print 'Performing saveSyx for '+scanFolder+' for '+\
-    ', '.join(numScansListStr)+' scans'    
+    print('Performing saveSyx for '+scanFolder+' for '+\
+    ', '.join(numScansListStr)+' scans') 
     
     params = np.load(scanFolder + '/array_parameters.npy')    
     
     if 'all' in numScansList:
         numScansList.remove('all')
         numScansList.append(int(params[1]))
-        print '(all scans = '+str(int(params[1]))+')'
+        print('(all scans = '+str(int(params[1]))+')')
         
     numSlices = int(params[0]) #required to declare Syx
     Syx = np.zeros((numSlices, numSlices))
@@ -223,16 +223,16 @@ def saveSyx(scanFolder, numScansList=['all']):
         #vector -> outer product
         
         if scan % 100 == 0:
-            print 'Syx calculated for first '+str(scan)+' scans'
+            print('Syx calculated for first '+str(scan)+' scans')
     
         if scan in numScansList:
             np.save(scanFolder + '/Syx_' + str(scan) + '_scans.npy', Syx)
-            print 'Syx saved for '+str(scan)+' scans'
+            print('Syx saved for '+str(scan)+' scans')
         
     print 'Completed saveSyx for '+scanFolder+' for '+\
     ', '.join(numScansListStr)+' scans'
     if 'all' in numScansListStr:
-        print '(all scans = '+str(int(params[1]))+')'
+        print('(all scans = '+str(int(params[1]))+')')
     
     return
     
@@ -241,13 +241,13 @@ def saveSyxEinSum(scanFolder, numScans=13):
     heavy operation and it is useful to have the result saved for further 
     analyses."""    
     
-    print 'Performing saveSyxEinSum for '+scanFolder+' for '+str(numScans)+\
-    ' scans'        
+    print('Performing saveSyxEinSum for '+scanFolder+' for '+str(numScans)+\
+    ' scans')
     
     if numScans=='all':
         params = np.load(scanFolder + '/array_parameters.npy')
         numScans=int(params[1])
-        print '(all scans = '+str(numScans)+')'
+        print('(all scans = '+str(numScans)+')')
 
     array = np.load(scanFolder + '/array.npy')
     
@@ -255,10 +255,10 @@ def saveSyxEinSum(scanFolder, numScans=13):
     #row 0 of array holds m/z values so start from from 1
     np.save(scanFolder + '/Syx_' + str(numScans) + '_scans.npy', Syx)
     
-    print 'Completed saveSyxEinSum for '+scanFolder+' for '+str(numScans)+\
-    ' scans'
+    print('Completed saveSyxEinSum for '+scanFolder+' for '+str(numScans)+\
+    ' scans')
     if numScans=='all':
-        print '(all scans = '+str(int(params[1]))+')'
+        print('(all scans = '+str(int(params[1]))+')')
     
     return
     
@@ -321,7 +321,7 @@ def readmgf2(mgfFile, scanFolder, maxScans=1e8): #added 20220816
 
     fullScanFolder = scanFolder
     
-    print 'Reading MGF file (readmgf2) '+mgfFile+' to '+fullScanFolder
+    print('Reading MGF file (readmgf2) '+mgfFile+' to '+fullScanFolder)
     
     import os
     os.mkdir(fullScanFolder)
@@ -338,8 +338,8 @@ def readmgf2(mgfFile, scanFolder, maxScans=1e8): #added 20220816
                 numScans += 1
                 if numScans >= maxScans:
                     break    
-#            if line[:7]=='CHARGE=':
-            if line[:8]=='PEPMASS=': # added 20230413
+            if line[:7]=='CHARGE=' or line[:8]=='PEPMASS=': # changed 20240816
+            # if line[:8]=='PEPMASS=': # added 20230413
                 binCount = 0
 
     f.close()            
@@ -360,6 +360,7 @@ def readmgf2(mgfFile, scanFolder, maxScans=1e8): #added 20220816
                     break
                 
             elif inIons:
+                if line[:7]=='CHARGE=' or line[:8]=='PEPMASS=': continue
                 lspl=line.split()
                 if scanCount==0:
                     array[0,binInd]=float(lspl[0])
@@ -367,8 +368,7 @@ def readmgf2(mgfFile, scanFolder, maxScans=1e8): #added 20220816
                 array[scanCount+1,binInd]=float(lspl[1])
                 binInd+=1
                 
-#            elif line[:7]=='CHARGE=':
-            elif line[:8]=='PEPMASS=': # added 20230413
+            elif line[:7]=='CHARGE=' or line[:8]=='PEPMASS=':
                 inIons=True
                 binInd=0
     f.close()
@@ -393,6 +393,6 @@ def readmgf2(mgfFile, scanFolder, maxScans=1e8): #added 20220816
     np.save(fullScanFolder + '/array.npy', array)
     np.save(fullScanFolder + '/array_parameters.npy', params)
     
-    print 'readmgf2 complete for '+fullScanFolder    
+    print('readmgf2 complete for '+fullScanFolder)
     
     return

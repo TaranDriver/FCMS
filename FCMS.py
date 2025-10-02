@@ -502,7 +502,7 @@ class CCovMap(Map):
         if os.path.isfile(self.syxPath()):
             self.SyxH5 = h5py.File(self.syxPath(), 'r')['Syx']
         else:
-            print 'Syx not saved for this map, beginning calculation with saveSyxEinSumCC...'
+            print('Syx not saved for this map, beginning calculation with saveSyxEinSumCC...')
             self.saveSyxEinSumCC()
             self.SyxH5 = h5py.File(self.syxPath(), 'r')['Syx']
         
@@ -1053,3 +1053,4 @@ class CCovPeak(CovPeak):
             
 
         return (cCovSumSqd - (cCovSum**2)/(numScans))/numScans
+

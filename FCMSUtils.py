@@ -229,8 +229,8 @@ def saveSyx(scanFolder, numScansList=['all']):
             np.save(scanFolder + '/Syx_' + str(scan) + '_scans.npy', Syx)
             print('Syx saved for '+str(scan)+' scans')
         
-    print 'Completed saveSyx for '+scanFolder+' for '+\
-    ', '.join(numScansListStr)+' scans'
+    print('Completed saveSyx for '+scanFolder+' for '+\
+    ', '.join(numScansListStr)+' scans')
     if 'all' in numScansListStr:
         print('(all scans = '+str(int(params[1]))+')')
     
@@ -396,3 +396,4 @@ def readmgf2(mgfFile, scanFolder, maxScans=1e8): #added 20220816
     print('readmgf2 complete for '+fullScanFolder)
     
     return
+
